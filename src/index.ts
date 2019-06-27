@@ -25,11 +25,17 @@ createConnection().then(async connection => {
         console.log('setup done');
     }
     const spotRepo = getRepository(Spot);
-    const spot = await spotRepo.createQueryBuilder('spot').innerJoin('spot.user', 'user').where('user.id = :id', { id: 1 }).getOne();
+    const spot = await spotRepo.createQueryBuilder('spot')
+        .innerJoin('spot.user', 'user')
+        .where('user.id = :id', { id: 1 })
+        .getOne();
     if (spot !== undefined) {
         console.log(spot);
         console.log('Got the spot');
-        const spotWithThings = await spotRepo.createQueryBuilder('spot').leftJoinAndSelect('spot.things', 'things').where('spot.id = :id', { id: spot.id }).getOne();
+        const spotWithThings = await spotRepo.createQueryBuilder('spot')
+            .leftJoinAndSelect('spot.things', 'things')
+            .where('spot.id = :id', { id: spot.id })
+            .getOne();
         console.log(spotWithThings);
     } else {
         console.log(`No spot? with user id ${1}`);
