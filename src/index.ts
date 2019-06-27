@@ -28,6 +28,7 @@ createConnection().then(async connection => {
     const spot = await spotRepo.createQueryBuilder('spot')
         .innerJoin('spot.user', 'user')
         .where('user.id = :id', { id: 1 })
+        .andWhere('spot.id = :id', {id: 1})
         .getOne();
     if (spot !== undefined) {
         console.log(spot);
