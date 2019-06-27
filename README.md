@@ -26,7 +26,7 @@ This is [`index.ts`](src/index.ts).
 this is [`Spot.ts`](src/entity/Spot.ts).
 
 
-This is [Thing.ts](src/entity/Thing.ts).
+This is [`Thing.ts`](src/entity/Thing.ts).
 
 
 This is [`User.ts`](src/entity/User.ts).
