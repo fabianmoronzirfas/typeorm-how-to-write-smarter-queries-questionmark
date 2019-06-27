@@ -1,6 +1,6 @@
 # Writing Better Queries with Typeorm? 
 
-How can I write a better query for selecting my things?
+How can I write a better query for selecting my things (see the [stackoverflow question](https://stackoverflow.com/questions/56790133/how-can-i-optimze-my-query-to-select-things-using-querybuilder-in-typeorm))?
 
 I have 3 enitites User, Spot and Thing.
 An User can have many spots and a spot can have many things.
