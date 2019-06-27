@@ -5,12 +5,9 @@ How can I write a better query for selecting my things?
 I have 3 enitites User, Spot and Thing.
 An User can have many spots and a spot can have many things.
 
-Currently I'm writing to queries to validate that the spot exists on th user and then one to get the things from the spot. (See index.js).
+Currently I'm writing two queries, one to validate that the spot exists on the user and then one to get the things from the spot. (See `index.js`).
 
-How can I write one query using `createQueryBuilder` (not using the `repo.find` ) to select all things based on `user.id` and `spot.id`? I know there are is some joining involved but I can't wrap my head around it.
-
-
-
+How can I write one query using `createQueryBuilder` (not using the `repo.find` ) to select all things based on `user.id` and `spot.id`? I know there is some joining involved but I can't wrap my head around it.
 
 Steps to run this project:
 
@@ -53,11 +50,17 @@ createConnection().then(async connection => {
         console.log('setup done');
     }
     const spotRepo = getRepository(Spot);
-    const spot = await spotRepo.createQueryBuilder('spot').innerJoin('spot.user', 'user').where('user.id = :id', { id: 1 }).getOne();
+    const spot = await spotRepo.createQueryBuilder('spot')
+    .innerJoin('spot.user', 'user')
+    .where('user.id = :id', { id: 1 })
+    .getOne();
     if (spot !== undefined) {
         console.log(spot);
         console.log('Got the spot');
-        const spotWithThings = await spotRepo.createQueryBuilder('spot').leftJoinAndSelect('spot.things', 'things').where('spot.id = :id', { id: spot.id }).getOne();
+        const spotWithThings = await spotRepo.createQueryBuilder('spot')
+        .leftJoinAndSelect('spot.things', 'things')
+        .where('spot.id = :id', { id: spot.id })
+        .getOne();
         console.log(spotWithThings);
     } else {
         console.log(`No spot? with user id ${1}`);
