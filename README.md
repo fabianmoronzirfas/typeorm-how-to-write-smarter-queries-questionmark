@@ -5,15 +5,65 @@ How can I write a better query for selecting my things?
 I have 3 enitites User, Spot and Thing.
 An User can have many spots and a spot can have many things.
 
-How can I write one query using `createQueryBuilder` (not using the `repo.find` ) to select all things based on `user.id` and `spot.id`?
+Currently I'm writing to queries to validate that the spot exists on th user and then one to get the things from the spot. (See index.js).
+
+How can I write one query using `createQueryBuilder` (not using the `repo.find` ) to select all things based on `user.id` and `spot.id`? I know there are is some joining involved but I can't wrap my head around it.
+
 
 
 
 Steps to run this project:
 
-1. Run `npm i` command
-2. Setup database settings inside `ormconfig.json` file
-3. Run `npm start` command
+1. `git clone https://github.com/fabianmoronzirfas/typeorm-how-to-write-smarter-queries-questionmark.git ./test-repo && cd test-repo`
+2. Run `npm i` command
+3. Setup database settings inside `ormconfig.json` file
+4. start database `docker-compose up`
+5. Run `npm start` command
+
+
+
+This is `index.ts`
+
+
+```js
+import "reflect-metadata";
+import { createConnection, getRepository } from "typeorm";
+import { User } from "./entity/User";
+import { Spot } from './entity/Spot';
+import { Thing } from './entity/Thing';
+
+createConnection().then(async connection => {
+    {
+        console.log("Inserting a new data into the database...");
+        const user = new User();
+        const spot = new Spot();
+        // const things = [];
+        for (let i = 0; i < 5; i++) {
+            const thing = new Thing();
+            if (spot.things === undefined) {
+                spot.things = [thing];
+            } else {
+                spot.things.push(thing);
+            }
+            await connection.manager.save(thing);;
+        }
+        user.spots = [spot];
+        await connection.manager.save(user);
+        await connection.manager.save(spot);
+        console.log('setup done');
+    }
+    const spotRepo = getRepository(Spot);
+    const spot = await spotRepo.createQueryBuilder('spot').innerJoin('spot.user', 'user').where('user.id = :id', { id: 1 }).getOne();
+    if (spot !== undefined) {
+        console.log(spot);
+        console.log('Got the spot');
+        const spotWithThings = await spotRepo.createQueryBuilder('spot').leftJoinAndSelect('spot.things', 'things').where('spot.id = :id', { id: spot.id }).getOne();
+        console.log(spotWithThings);
+    } else {
+        console.log(`No spot? with user id ${1}`);
+    }
+}).catch(error => console.log(error));
+```
 
 
 
@@ -74,50 +124,6 @@ export class User {
       public spots: Spot[];
 }
 
-```
-
-
-This is `index.ts`
-
-
-```js
-import "reflect-metadata";
-import { createConnection, getRepository } from "typeorm";
-import { User } from "./entity/User";
-import { Spot } from './entity/Spot';
-import { Thing } from './entity/Thing';
-
-createConnection().then(async connection => {
-    {
-        console.log("Inserting a new data into the database...");
-        const user = new User();
-        const spot = new Spot();
-        // const things = [];
-        for (let i = 0; i < 5; i++) {
-            const thing = new Thing();
-            if (spot.things === undefined) {
-                spot.things = [thing];
-            } else {
-                spot.things.push(thing);
-            }
-            await connection.manager.save(thing);;
-        }
-        user.spots = [spot];
-        await connection.manager.save(user);
-        await connection.manager.save(spot);
-        console.log('setup done');
-    }
-    const spotRepo = getRepository(Spot);
-    const spot = await spotRepo.createQueryBuilder('spot').innerJoin('spot.user', 'user').where('user.id = :id', { id: 1 }).getOne();
-    if (spot !== undefined) {
-        console.log(spot);
-        console.log('Got the spot');
-        const spotWithThings = await spotRepo.createQueryBuilder('spot').leftJoinAndSelect('spot.things', 'things').where('spot.id = :id', { id: spot.id }).getOne();
-        console.log(spotWithThings);
-    } else {
-        console.log(`No spot? with user id ${1}`);
-    }
-}).catch(error => console.log(error));
 ```
 
 
